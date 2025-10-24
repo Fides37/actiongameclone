@@ -1,9 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
-
-public class PlayerController : MonoBehaviour
+using UnityEngine.UI;
+using UnityEngine.UIElements;
+using UnityEngine.SceneManagement;
+public class CatController : MonoBehaviour
 {
     public Camera cam;
     public Rigidbody2D rigidBody;
@@ -16,16 +19,14 @@ public class PlayerController : MonoBehaviour
     private int damage = 1;
     private int calcHealth;
 
-    public float KBForce;
-    public float KBCounter;
-    public float KBTotalTime;
-    public bool KnockFromRight;
-    private float input;
+    public TextMeshProUGUI guyDialogue;
+    public GameObject guyPanel;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        guyDialogue.text = "";
+        guyPanel.SetActive(false);
     }
 
     // Update is called once per frame
@@ -89,47 +90,13 @@ public class PlayerController : MonoBehaviour
     }
 
 
-
-    private void PlayerDamageHealth()
-    {
-        calcHealth = health - damage;
-
-        if (calcHealth <= 0)
-        {
-            Destroy(gameObject);
-        }
-    }
-
-    private void KnockBackBoy()
-    {
-        if (KBCounter <= 0)
-        {
-            rigidBody.velocity = new Vector2(input * speed, rigidBody.velocity.y);
-        }
-        else
-        {
-            if(KnockFromRight == true)
-            {
-                rigidBody.velocity = new Vector2(-KBForce, KBForce);
-            }
-            if (KnockFromRight == false)
-            {
-                rigidBody.velocity = new Vector2(KBForce, KBForce);
-            }
-
-            KBCounter -= Time.deltaTime;
-
-        }
-    }
-
-
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "EnemyBullet")
+        if (collision.gameObject.name == "Mana")
         {
-            damage ++;
+            Destroy(gameObject);
 
-            PlayerDamageHealth();
+            SceneManager.LoadScene("GameOver");
         }
     }
 
@@ -137,7 +104,39 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.name == "GuyDialogue")
         {
+            guyPanel.SetActive(true);
+            guyDialogue.text = "[E] to interact";
 
+            if (Input.GetKey(KeyCode.E))
+            {
+                Debug.Log("Yo gurt");
+                guyDialogue.text = "There's something weird happening in this maze. I can sense it.";
+            }
+
+
+        }
+    }
+
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (collision.name == "GuyDialogue")
+        {
+            if (Input.GetKey(KeyCode.E))
+            {
+            Debug.Log("Yo gurt");
+            guyDialogue.text = "There's something weird happening in this maze. I can sense it.";
+            }
+
+        }
+        
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.name == "GuyDialogue")
+        {
+            guyPanel.SetActive(false);
+            guyDialogue.text = "";
         }
     }
 
